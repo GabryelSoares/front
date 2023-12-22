@@ -60,7 +60,9 @@ export function SignInForm() {
         isAuthenticated: true,
         establishment: res.data.establishment,
       })
-      localStorage.setItem('accessToken', res.data.accessToken)
+      if(typeof window !== 'undefined') {
+        localStorage.setItem('accessToken', res.data.accessToken)
+      }
       toast({
         title: "Signed In",
       })

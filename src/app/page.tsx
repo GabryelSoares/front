@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     // console.log(`${pathname}:: `, sessionData)
-    const accessToken = localStorage.getItem('accessToken')
+    const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : ''
     if((!accessToken || !sessionData) && !['/sign-in', '/sign-up', '/'].includes(pathname)) {
       router.push('/sign-in')
     }

@@ -1,4 +1,5 @@
 "use client"
+
 import {
   Table,
   TableBody,
@@ -12,18 +13,14 @@ import { toast } from "@/components/ui/use-toast"
 import { Vehicle } from "@/models/vehicle"
 import { api } from "@/lib/api"
 
-export default async function Vehicles() {
+export default async function VehiclesPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
 
   async function getVehicles() {
     setIsLoading(true)
     try {
-      const response = await api<Vehicle[]>('/vehicles', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      })
+      const response = await api<Vehicle[]>('/vehicles')
       setVehicles(response.data)
     } catch(error) {
       toast({

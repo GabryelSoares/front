@@ -40,7 +40,10 @@ export default async function ParkingRegisters() {
   return (
     <div className="p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Registtros de entrada e saída</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Registros de entrada e saída</h1>
+        <div>
+            
+        </div>
         <button
           className="rounded-md p-2 text-gray-700 outline-none focus:border focus:border-gray-400"
           disabled={isLoading}

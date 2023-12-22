@@ -1,7 +1,7 @@
 import { ApiResponse } from "@/models/api-response";
 
 export const api = async <T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
   await new Promise((resolve) => setTimeout(resolve, 1 * 1000));
   if(accessToken) {
     options.headers = {

@@ -13,12 +13,8 @@ export default async function Vehicles() {
 
   async function getVehicles() {
     try {
-      const response = await api('/vehicles', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      })
-      setVehicles(response)
+      const response = await api<Vehicle[]>('/vehicles')
+      setVehicles(response.data)
     } catch(error) {
       toast({
         title: "Erro ao buscar estabelecimentos",

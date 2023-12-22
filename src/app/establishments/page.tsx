@@ -1,4 +1,5 @@
 "use client"
+
 import {
   Table,
   TableBody,
@@ -12,12 +13,11 @@ import axios from "axios"
 import { toast } from "@/components/ui/use-toast"
 import { Establishment } from "@/models/establishment"
 
-export default async function TaskPage() {
+export default async function EstablishmentsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [establishments, setEstablishments] = useState<Establishment[]>([])
 
   async function getEstablishments() {
-    'use client'
     setIsLoading(true)
     axios.get(process.env.NEXT_PUBLIC_API_URL + '/establishments', {
       headers: {
