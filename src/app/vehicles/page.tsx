@@ -8,52 +8,84 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useEffect, useState } from "react"
-import { toast } from "@/components/ui/use-toast"
-import { Vehicle } from "@/models/vehicle"
-import { api } from "@/lib/api"
+import { useContext, useEffect } from "react"
+import { BookPlusIcon } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { CreateVehicleForm } from "@/components/forms/vehicles/create-vehicle-form"
+import { VehiclesContext } from "@/context/vehicles-context"
+import { RowActionsDropdown } from "@/components/molecules/vehicles/row-actions-dropdown"
+import ViewVehicleModal from "@/components/molecules/vehicles/view-vehicle-modal"
+import UpdateVehicleModal from "@/components/molecules/vehicles/update-vehicle-modal"
+import DeleteVehicleModal from "@/components/molecules/vehicles/delete-vehicle-modal"
+import { ListVehiclesForm } from "@/components/forms/vehicles/list-vehicles-form"
 
 export default function VehiclesPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-
-  async function getVehicles() {
-    setIsLoading(true)
-    try {
-      const response = await api<Vehicle[]>('/vehicles')
-      setVehicles(response.data)
-    } catch(error) {
-      toast({
-        title: "Erro ao buscar veículos",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const {
+    fetchVehicles,
+    isLoading,
+    vehicles,
+    showCreateVehicleModal,
+    setShowCreateVehicleModal,
+    showUpdateVehicleModal,
+    showDeleteVehicleModal,
+    showViewVehicleModal,
+    submitFetchVehicles 
+  } = useContext(VehiclesContext)
 
   useEffect(() => {
-    if(vehicles) {
-      console.log('vehicles:: ', vehicles)
+    console.log('submitFetchVehicles:: ', submitFetchVehicles)
+    if(submitFetchVehicles) {
+      fetchVehicles()
     }
-  }, [vehicles])
+  }, [submitFetchVehicles])
 
   return (
     <div className="p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Vehicles</h1>
+        <Dialog open={showCreateVehicleModal} onOpenChange={setShowCreateVehicleModal}>
+          <DialogTrigger asChild>
+            <h1 className="text-2xl font-semibold tracking-tight flex flex-row hover:text-blue-500 text-blue-700 hover:cursor-pointer"><span className="pt-1 pr-1"><BookPlusIcon /></span> Vehicles</h1>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Cadastrar veículo</DialogTitle>
+            </DialogHeader>
+            <CreateVehicleForm />
+            <DialogFooter className="sm:justify-start">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  Close
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* <ListVehiclesForm /> */}
         <button
-          className="rounded-md p-2 text-gray-700 outline-none focus:border focus:border-gray-400"
+          className="font-semibold rounded-md p-2 outline-none focus:border focus:border-gray-400  hover:text-blue-500 text-blue-700 hover:cursor-pointer"
           disabled={isLoading}
-          onClick={() => getVehicles()}
+          onClick={() => fetchVehicles()}
         >
           Search
         </button>
       </div>
-      <>
+      <Card>
         <Table>
-          <TableCaption>A list of vehicles.</TableCaption>
+          <TableCaption>Lista de veículos</TableCaption>
           <TableHeader>
             <TableRow>
+              <TableHead className="" />
               <TableHead>Placa</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Marca</TableHead>
@@ -62,8 +94,9 @@ export default function VehiclesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicles && vehicles?.map((item, i) => (
+            {vehicles && Array.isArray(vehicles) && vehicles?.map((item, i) => (
               <TableRow key={item.id || i}>
+                <TableHead><RowActionsDropdown vehicle={item} /></TableHead>
                 <TableHead className="font-medium">{item?.plate || '-'}</TableHead>
                 <TableHead>{item?.type || '-'}</TableHead>
                 <TableHead>{item?.brand || '-'}</TableHead>
@@ -73,7 +106,10 @@ export default function VehiclesPage() {
             ))}
           </TableBody>
         </Table>
-      </>
+      </Card>
+      {showViewVehicleModal && <ViewVehicleModal />}
+      {showUpdateVehicleModal && <UpdateVehicleModal />}
+      {showDeleteVehicleModal && <DeleteVehicleModal />}
     </div>
   )
 }
