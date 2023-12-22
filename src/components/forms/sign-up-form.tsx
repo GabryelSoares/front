@@ -10,25 +10,15 @@ import { Input } from "../ui/input"
 import { Icons } from "../atoms/icons/icons"
 
 import {
-  Form
+  Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
 import { toast } from "@/components/ui/use-toast"
 import { SessionContext } from "@/context/session-context"
 import axios from "axios"
 import { th } from "date-fns/locale"
-// import axios from "../libs/axios/axios"
-// import { useSigninMutation } from "@/store/authApi"
-// {
-//   "name": "string",
-//   "cnpj": "string",
-//   "email": "string",
-//   "password": "string",
-//   "address": "string",
-//   "phone": "string",
-//   "motorcycleSlots": 0,
-//   "carSlots": 0
-// }
-const accountFormSchema = z.object({
+import { api } from "@/lib/api"
+
+const formSchema = z.object({
   name: z.string().min(8, {
     message: "Name must be at least 8 characters.",
   }),
@@ -47,15 +37,15 @@ const accountFormSchema = z.object({
   phone: z.string().min(8, {
     message: "Phone must be at least 8 characters.",
   }),
-  motorcycleSlots: z.number().min(10, {
-    message: "Motorcycle slots must be at least 0.",
+  motorcycleSlots: z.string().min(2, {
+    message: "Motorcycle slots must be at least 10.",
   }),
-  carSlots: z.number().min(10, {
-    message: "Car slots must be at least 0.",
+  carSlots: z.string().min(2, {
+    message: "Car slots must be at least 10.",
   }),
 })
 
-type AccountFormValues = z.infer<typeof accountFormSchema>
+type AccountFormValues = z.infer<typeof formSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<AccountFormValues> = {
@@ -66,127 +56,151 @@ const defaultValues: Partial<AccountFormValues> = {
 
 export function SignUpForm() {
   const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues,
   })
   const [isLoading, setIsLoading] = useState(false)
   const { updateSession } = useContext(SessionContext);
-  
-  async function onSubmit(formValues: AccountFormValues) {
-    
-    axios.post(process.env.NEXT_PUBLIC_API_URL +'/auth/sign-up', formValues).then((res) => {
-      if(!res.data?.accessToken){
-        throw new Error('Invalid credentials')
+
+  async function onSubmit(formValues: z.infer<typeof formSchema>) {
+    console.log('onSubmit!');
+    try {
+      setIsLoading(true)
+      const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
+      console.log('formValues:: ', formValues)
+      const response = await api<any>('/auth/sign-up', {
+        method: 'POST', // Adicione esta linha para indicar que é uma solicitação POST
+        body: JSON.stringify({
+          ...formValues,
+          carSlots: parseInt(formValues.carSlots || '10'),
+          motorcycleSlots: parseInt(formValues.motorcycleSlots || '10')
+        })
+      })
+      console.log('response:: ', response)
+      if(response.data?.accessToken) {
+        updateSession(response.data)
       }
-      updateSession({
-        isAuthenticated: true,
-        establishment: res.data.establishment,
-      })
-      if(typeof window !== 'undefined') {
-        localStorage.setItem('accessToken', res.data.accessToken)
-      }
+      throw new Error('Erro ao cadastrar usuário')
+    } catch(error) {
       toast({
-        title: "Signed In",
+        title: "Erro ao buscar veículos",
       })
-    }).catch((err) => {
-      console.log(err);
-      toast({
-        title: "You submitted the following values:",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(formValues, null, 2)}</code>
-          </pre>
-        ),
-      })
-    }).finally(() => {
+    } finally {
       setIsLoading(false)
-    })
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-2">
-          <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              Email
-            </Label>
-            <Input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="password"
-              placeholder="password"
-              type="password"
-              autoCapitalize="none"
-              autoComplete="password"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="name"
-              placeholder="name"
-              type="text"
-              autoCapitalize="none"
-              autoComplete="name"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="cnpj"
-              placeholder="cnpj"
-              type="text"
-              autoCapitalize="none"
-              autoComplete="cnpj"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="address"
-              placeholder="address"
-              type="text"
-              autoCapitalize="none"
-              autoComplete="address"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="phone"
-              placeholder="phone"
-              type="text"
-              autoCapitalize="none"
-              autoComplete="phone"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="motorcycleSlots"
-              placeholder="motorcycleSlots"
-              type="number"
-              autoCapitalize="none"
-              autoComplete="motorcycleSlots"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="carSlots"
-              placeholder="carSlots"
-              type="number"
-              autoCapitalize="none"
-              autoComplete="carSlots"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-          </div>
-          <Button disabled={isLoading}>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Usuário</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="cnpj"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>CNPJ</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Senha</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Endereço</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Telefone</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="motorcycleSlots"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Vagas para moto</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="carSlots"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Vagas para carro</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button disabled={isLoading} type="submit">
             {isLoading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin bg-red-500" />
             )}
             Continuar
           </Button>

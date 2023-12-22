@@ -2,21 +2,20 @@
 import { ApiResponse } from "@/models/api-response";
 
 export const api = async <T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
+  console.log('api:: ', url, options)
   const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
-  await new Promise((resolve) => setTimeout(resolve, 1 * 1000));
-  if(accessToken) {
-    options.headers = {
+  console.log('accessToken:: ', accessToken)
+  
+  const response = await fetch(process.env.NEXT_PUBLIC_API_URL + url, {
+    ...options,
+    headers: {
       ...options.headers,
       'Authorization': `Bearer ${accessToken}`,
-    };
-  }
-
-  return await fetch(process.env.NEXT_PUBLIC_API_URL + url, options).then(async (response) => {
-    const data = await response.json();
-    if(response.ok) {
-      return { data, status: response.status };
-    } else {
-      return Promise.reject({ data, status: response.status });
-    }
+      'Content-Type': 'application/json',
+    },
+  }).then(res => {
+    console.log('res:: ', res)
+    return res.json()
   });
+  return response;
 };
