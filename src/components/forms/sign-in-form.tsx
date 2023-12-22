@@ -112,7 +112,7 @@ export function SignInForm() {
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Sign In
+            Continuar
           </Button>
         </div>
       </form>
