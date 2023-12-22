@@ -25,6 +25,7 @@ export const SessionProvider: FC<Props> = ({ children }) => {
   const clearSession = () => {
     setSession({ isAuthenticated: false })
     router.push('/sign-in')
+    localStorage.removeItem('accessToken')
   }
 
   const updateSession = (session: Session) => {
