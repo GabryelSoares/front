@@ -13,7 +13,7 @@ import axios from "axios"
 import { toast } from "@/components/ui/use-toast"
 import { Establishment } from "@/models/establishment"
 
-export default async function EstablishmentsPage() {
+export default function EstablishmentsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [establishments, setEstablishments] = useState<Establishment[]>([])
 

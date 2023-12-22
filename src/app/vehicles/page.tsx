@@ -13,7 +13,7 @@ import { toast } from "@/components/ui/use-toast"
 import { Vehicle } from "@/models/vehicle"
 import { api } from "@/lib/api"
 
-export default async function VehiclesPage() {
+export default function VehiclesPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
 

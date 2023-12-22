@@ -13,7 +13,7 @@ import { api } from "@/lib/api"
 import { ParkingRegister } from "@/models/parking-register"
 import { formatDate } from "@/lib/utils"
 
-export default async function ParkingRegisters() {
+export default function ParkingRegisters() {
   const [isLoading, setIsLoading] = useState(false)
   const [parkingRegisters, setParkingRegisters] = useState<ParkingRegister[]>([])
 

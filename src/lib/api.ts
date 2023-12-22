@@ -1,3 +1,4 @@
+'use client'
 import { ApiResponse } from "@/models/api-response";
 
 export const api = async <T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
