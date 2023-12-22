@@ -1,0 +1,11 @@
+FROM node:20
+
+WORKDIR /front
+
+COPY front/package*.json .
+
+RUN npm install
+
+COPY front/. /front
+
+CMD npm start
