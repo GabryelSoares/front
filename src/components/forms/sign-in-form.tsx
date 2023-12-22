@@ -1,23 +1,20 @@
 "use client"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "../ui/button"
-import { Label } from "@radix-ui/react-label"
 import { Input } from "../ui/input"
 import { Icons } from "../atoms/icons/icons"
 
 import {
-  Form
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
 import { toast } from "@/components/ui/use-toast"
 import { SessionContext } from "@/context/session-context"
-import axios from "axios"
-import { th } from "date-fns/locale"
-// import axios from "../libs/axios/axios"
-// import { useSigninMutation } from "@/store/authApi"
+import { api } from "@/lib/api"
+import { Establishment } from "@/models/establishment"
 
 const accountFormSchema = z.object({
   password: z
@@ -35,11 +32,9 @@ const accountFormSchema = z.object({
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
-// This can come from your database or API.
 const defaultValues: Partial<AccountFormValues> = {
-  email: "gabryel@gmail.com",
-  password: "gabryel123",
-  // dob: new Date("2023-01-23"),
+  // email: "gabryel@gmail.com",
+  // password: "gabryel123",
 }
 
 export function SignInForm() {
@@ -49,36 +44,41 @@ export function SignInForm() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const { updateSession } = useContext(SessionContext);
-  
+
   async function onSubmit(formValues: AccountFormValues) {
-    
-    axios.post(process.env.NEXT_PUBLIC_API_URL +'/auth/sign-in', formValues).then((res) => {
-      if(!res.data?.accessToken){
-        throw new Error('Invalid credentials')
+    try {
+      setIsLoading(true)
+      console.log('formValues:: ', formValues)
+      const response = await api<{
+        accessToken: string,
+        establishment: Establishment,
+      }>('/auth/sign-in', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...formValues,
+        })
+      })
+      console.log('response:: ', response)
+      if(!response.data?.accessToken) {
+        throw new Error('Erro na autenticação')
       }
       updateSession({
         isAuthenticated: true,
-        establishment: res.data.establishment,
+        establishment: response.data.establishment,
       })
       if(typeof window !== 'undefined') {
-        localStorage.setItem('accessToken', res.data.accessToken)
+        localStorage.setItem('accessToken', response.data.accessToken)
       }
       toast({
-        title: "Signed In",
+        title: "Login realizado com sucesso!",
       })
-    }).catch((err) => {
-      console.log(err);
+    } catch(error) {
       toast({
-        title: "You submitted the following values:",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(formValues, null, 2)}</code>
-          </pre>
-        ),
+        title: "Erro na autenticação",
       })
-    }).finally(() => {
+    } finally {
       setIsLoading(false)
-    })
+    }
   }
 
   return (
@@ -86,29 +86,34 @@ export function SignInForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-2">
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              Email
-            </Label>
-            <Input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Input
-              id="password"
-              placeholder="password"
-              type="password"
-              autoCapitalize="none"
-              autoComplete="password"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Senha</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password"/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />          
           </div>
-          <Button disabled={isLoading}>
+          <Button disabled={isLoading} type="submit">
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}

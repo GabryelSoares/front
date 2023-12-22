@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { LuParkingCircle } from "react-icons/lu";
 import { SessionContext } from '@/context/session-context';
+import { usePathname } from 'next/navigation';
 
 
 export default function Navbar() {
   const [open, setOpen] = React.useState(false)
-  const { data: sessionData } = React.useContext(SessionContext);
+  const { data: sessionData, clearSession } = React.useContext(SessionContext);
+  const pathname = usePathname()
 
   const menus = [
     { title: 'Início', path: '/', isPublic: true },
@@ -56,13 +58,31 @@ export default function Navbar() {
                 )}
               </li>
             ))}
+            {pathname !== '/sign-in' && (
+              <li
+                key='login-mobile'
+                className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded lg:hidden"
+              >
+                {sessionData?.isAuthenticated ? (
+                  <span onClick={() => clearSession()}>Logout</span>
+                ) : (
+                  <Link href='/sign-in'>Login</Link>
+                )}
+              </li>
+            )}
           </ul>
         </div>
-        <div className={`font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue ${open ? 'block' : 'hidden'
-          }`}>
-          <Link href='/sign-in'>Login</Link>
-        </div>
+        {pathname !== '/sign-in' && (
+          <div
+            className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded hover:cursor-pointer">
+            {sessionData?.isAuthenticated ? (
+              <span onClick={() => clearSession()}>Logout</span>
+            ) : (
+              <Link href='/sign-in'>Login</Link>
+            )}
+          </div>
+        )}
       </div>
-    </nav>
+    </nav >
   )
 }

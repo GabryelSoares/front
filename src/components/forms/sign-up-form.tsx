@@ -1,21 +1,18 @@
 "use client"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "../ui/button"
-import { Label } from "@radix-ui/react-label"
 import { Input } from "../ui/input"
 import { Icons } from "../atoms/icons/icons"
 
 import {
-  Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
 import { toast } from "@/components/ui/use-toast"
 import { SessionContext } from "@/context/session-context"
-import axios from "axios"
-import { th } from "date-fns/locale"
 import { api } from "@/lib/api"
 
 const formSchema = z.object({
@@ -66,7 +63,6 @@ export function SignUpForm() {
     console.log('onSubmit!');
     try {
       setIsLoading(true)
-      const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
       console.log('formValues:: ', formValues)
       const response = await api<any>('/auth/sign-up', {
         method: 'POST', // Adicione esta linha para indicar que é uma solicitação POST
@@ -78,12 +74,21 @@ export function SignUpForm() {
       })
       console.log('response:: ', response)
       if(response.data?.accessToken) {
-        updateSession(response.data)
+        updateSession({
+          isAuthenticated: true,
+          establishment: response.data.establishment,
+        })
+        if(typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', response.data.accessToken)
+        }
+        toast({
+          title: "Usuário cadastrado com sucesso",
+        })
       }
       throw new Error('Erro ao cadastrar usuário')
     } catch(error) {
       toast({
-        title: "Erro ao buscar veículos",
+        title: "Erro ao cadastrar usuário",
       })
     } finally {
       setIsLoading(false)

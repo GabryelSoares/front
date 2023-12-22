@@ -20,8 +20,10 @@ export default function ParkingRegisters() {
   async function getParkingRegisters() {
     setIsLoading(true)
     try {
-      const response = await api<ParkingRegister[]>('/parking-registers')
-      setParkingRegisters(response.data)
+      api<ParkingRegister[]>('/parking-registers').then((response) => {
+        console.log('response:: ', response)
+        setParkingRegisters(response.data)
+      })
     } catch(error) {
       toast({
         title: "Erro ao buscar registros de estacionamento",

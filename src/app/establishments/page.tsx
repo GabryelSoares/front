@@ -9,30 +9,32 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { toast } from "@/components/ui/use-toast"
 import { Establishment } from "@/models/establishment"
+import { api } from "@/lib/api"
 
 export default function EstablishmentsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [establishments, setEstablishments] = useState<Establishment[]>([])
 
   async function getEstablishments() {
-    setIsLoading(true)
-    axios.get(process.env.NEXT_PUBLIC_API_URL + '/establishments', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+    try {
+      setIsLoading(true)
+      const response = await api<Establishment[]>('/establishments', {
+        method: 'GET',
+      })
+      console.log('response:: ', response)
+      if(response.data) {
+        setEstablishments(response.data)
       }
-    }).then((res) => {
-      setEstablishments(res.data)
-    }).catch((err) => {
-      console.log(err);
+      throw new Error('Erro na autenticação')
+    } catch(error) {
       toast({
         title: "Erro ao buscar estabelecimentos",
       })
-    }).finally(() => {
+    } finally {
       setIsLoading(false)
-    })
+    }
   }
 
   useEffect(() => {
