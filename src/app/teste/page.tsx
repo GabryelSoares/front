@@ -18,7 +18,6 @@ export default function Teste() {
         <button onClick={() => signOut()}>Sign out</button>
         <br />
         <br />
-        <br />
         <GetVehiclesForm />
       </>
     )
