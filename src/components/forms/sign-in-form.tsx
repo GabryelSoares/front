@@ -52,7 +52,9 @@ export function SignInForm() {
         password: formValues.password,
         redirect: false
       });
-
+      if(response?.status === 401) {
+        throw new Error("Usuário ou senha inválidos")
+      }
       if(!response?.ok) {
         throw new Error(response?.error || "Erro na autenticação")
       }

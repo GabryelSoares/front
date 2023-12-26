@@ -28,7 +28,9 @@ export const authOptions: NextAuthOptions = {
             },
             body: JSON.stringify(credentials),
           }).then((res) => res.json());
-
+          if(response.statusCode === 401) {
+            throw new Error('Credenciais inválidas');
+          }
           if(!response?.accessToken) {
             throw new Error('Token não retornado');
           }
@@ -38,8 +40,8 @@ export const authOptions: NextAuthOptions = {
           user.email = decoded.establishment?.email || response.establishment?.email || JSON.stringify(decoded);
           cookies().set('accessToken', String(response.accessToken))
           return user;
-        } catch(error) {
-          console.error('Erro na autenticação:', error);
+        } catch(error: any) {
+          console.error(error.message || 'Erro na autenticação');
           return null;
         }
       },
