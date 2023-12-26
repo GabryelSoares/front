@@ -8,8 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useContext, useEffect } from "react"
-import { BookPlusIcon } from "lucide-react"
+import { useCallback, useContext, useEffect } from "react"
+import { BookPlusIcon, Search } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,25 +27,41 @@ import { RowActionsDropdown } from "@/components/molecules/vehicles/row-actions-
 import ViewVehicleModal from "@/components/molecules/vehicles/view-vehicle-modal"
 import UpdateVehicleModal from "@/components/molecules/vehicles/update-vehicle-modal"
 import DeleteVehicleModal from "@/components/molecules/vehicles/delete-vehicle-modal"
+import { getVehicles } from "@/_core/infra/actions/vehicles/getVehicles"
+import { toast } from "sonner"
 import { ListVehiclesForm } from "@/components/forms/vehicles/list-vehicles-form"
 
 export default function VehiclesPage() {
   const {
-    fetchVehicles,
     isLoading,
     vehicles,
+    setVehicles,
     showCreateVehicleModal,
     setShowCreateVehicleModal,
     showUpdateVehicleModal,
     showDeleteVehicleModal,
     showViewVehicleModal,
-    submitFetchVehicles 
+    setSubmitFetchVehicles,
+    submitFetchVehicles
   } = useContext(VehiclesContext)
 
+  const handleSubmit = useCallback(() => {
+    // const formValues = form.getValues()
+    // console.log('formValues:: ', formValues)
+    getVehicles().then((vehicles) => {
+      toast('Lista de veículos atualizada com sucesso!')
+      setVehicles(vehicles)
+      setSubmitFetchVehicles(false)
+    }).catch((error) => {
+      console.log('error:: ', error)
+      toast(error.message || "Erro ao buscar veículos")
+    })
+  }, []);
+
   useEffect(() => {
-    console.log('submitFetchVehicles:: ', submitFetchVehicles)
     if(submitFetchVehicles) {
-      fetchVehicles()
+      console.log('submitFetchVehicles:: ', submitFetchVehicles)
+      handleSubmit()
     }
   }, [submitFetchVehicles])
 
@@ -61,23 +77,15 @@ export default function VehiclesPage() {
               <DialogTitle>Cadastrar veículo</DialogTitle>
             </DialogHeader>
             <CreateVehicleForm />
-            <DialogFooter className="sm:justify-start">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Close
-                </Button>
-              </DialogClose>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        {/* <ListVehiclesForm /> */}
+        {/* <ListVehiclesForm onSubmit={handleSubmit} /> */}
         <button
-          className="font-semibold rounded-md p-2 outline-none focus:border focus:border-gray-400  hover:text-blue-500 text-blue-700 hover:cursor-pointer"
+          
           disabled={isLoading}
-          onClick={() => fetchVehicles()}
+          onClick={handleSubmit}
         >
-          Search
+          <Search />
         </button>
       </div>
       <Card>

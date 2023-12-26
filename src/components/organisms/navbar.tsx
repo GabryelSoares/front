@@ -4,17 +4,16 @@ import * as React from 'react'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { LuParkingCircle } from "react-icons/lu";
-import { SessionContext } from '@/context/session-context';
+import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-
 
 export default function Navbar() {
   const [open, setOpen] = React.useState(false)
-  const { data: sessionData, clearSession } = React.useContext(SessionContext);
+  const isAuthenticated = useSession().status === 'authenticated'
   const pathname = usePathname()
+  const hideNavigationButtons = ['/'].includes(pathname) && !isAuthenticated
 
   const menus = [
-    { title: 'Início', path: '/', isPublic: true },
     { title: 'Estabelecimentos', path: '/establishments' },
     { title: 'Veículos', path: '/vehicles' },
     { title: 'Registros', path: '/parking-registers' },
@@ -46,42 +45,33 @@ export default function Navbar() {
             }`}
         >
           <ul className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
-            {menus.map((item, idx) => (
+            {!hideNavigationButtons && menus.map((item, idx) => (
               <li
                 key={idx}
                 className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded"
               >
-                {item.isPublic && !sessionData?.isAuthenticated ? (
-                  <span>{item.title}</span>
-                ) : (
-                  <Link href={item.path}>{item.title}</Link>
-                )}
+                <Link href={item.path}>{item.title}</Link>
               </li>
             ))}
-            {pathname !== '/sign-in' && (
-              <li
-                key='login-mobile'
-                className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded lg:hidden"
-              >
-                {sessionData?.isAuthenticated ? (
-                  <span onClick={() => clearSession()}>Logout</span>
-                ) : (
-                  <Link href='/sign-in'>Login</Link>
-                )}
-              </li>
-            )}
+            <li
+              key='login-mobile'
+              className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded md:hidden"
+            >
+              {isAuthenticated ? (
+                <span onClick={() => signOut()}>Sair</span>
+              ) : (
+                <Link href='/sign-in'>Login</Link>
+              )}
+            </li>
           </ul>
         </div>
-        {pathname !== '/sign-in' && (
-          <div
-            className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded hover:cursor-pointer">
-            {sessionData?.isAuthenticated ? (
-              <span onClick={() => clearSession()}>Logout</span>
-            ) : (
-              <Link href='/sign-in'>Login</Link>
-            )}
-          </div>
-        )}
+        <div className="font-bold text-gray-600 transition-transform duration-300 hover:scale-105 hover:text-my_blue hover:bg-gray-100 p-2 rounded hidden md:block">
+          {isAuthenticated ? (
+            <span onClick={() => signOut()}>Sair</span>
+          ) : (
+            <Link href='/sign-in'><span>Login</span></Link>
+          )}
+        </div>
       </div>
     </nav >
   )

@@ -9,8 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useEffect, useState } from "react"
-import { toast } from "@/components/ui/use-toast"
-import { Establishment } from "@/models/establishment"
+import { toast } from "sonner"
+import { Establishment } from "@/_core/domain/models/establishment"
 import { api } from "@/lib/api"
 
 export default function EstablishmentsPage() {
@@ -29,8 +29,12 @@ export default function EstablishmentsPage() {
       }
       throw new Error('Erro na autenticação')
     } catch(error) {
-      toast({
-        title: "Erro ao buscar estabelecimentos",
+      toast("Erro ao buscar estabelecimentos", {
+        description: String(error),
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
       })
     } finally {
       setIsLoading(false)

@@ -30,7 +30,13 @@ export const createVehicleSchema = z.object({
     .max(30, {
       message: "Plate must not be longer than 30 characters.",
     }),
-  type: z.string(),
+  type: z.string()
+    .min(1, {
+      message: "vehicleType must be at least 2 characters.",
+    })
+    .max(1, {
+      message: "vehicleType must not be longer than 30 characters.",
+    }),
 })
 
 export type CreateVehicleFormValues = z.infer<typeof createVehicleSchema>

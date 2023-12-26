@@ -26,13 +26,6 @@ export default function UpdateVehicleModal() {
           <DialogTitle>Atualizar veículo</DialogTitle>
         </DialogHeader>
         <UpdateVehicleForm />
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Fechar
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

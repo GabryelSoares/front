@@ -12,7 +12,7 @@ import { VehicleTypeEnum } from "@/enums/vehicle-type.enum"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { VehiclesContext } from "@/context/vehicles-context"
-import { CreateVehicleFormValues, createVehicleSchema } from "@/app/schemas/vehicle/create-vehicle-schema"
+import { CreateVehicleFormValues, createVehicleSchema } from "@/_core/domain/schemas/vehicle/create-vehicle-schema"
 
 
 const defaultValues: Partial<CreateVehicleFormValues> = {

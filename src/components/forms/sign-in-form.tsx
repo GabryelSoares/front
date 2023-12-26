@@ -1,5 +1,5 @@
 "use client"
-import { useContext, useState } from "react"
+import { useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -11,10 +11,9 @@ import { Icons } from "../atoms/icons/icons"
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
-import { toast } from "@/components/ui/use-toast"
-import { SessionContext } from "@/context/session-context"
-import { api } from "@/lib/api"
-import { Establishment } from "@/models/establishment"
+import { toast } from "sonner"
+import { signIn } from "next-auth/react"
+import { useRouter } from 'next/navigation'
 
 const accountFormSchema = z.object({
   password: z
@@ -43,39 +42,25 @@ export function SignInForm() {
     defaultValues,
   })
   const [isLoading, setIsLoading] = useState(false)
-  const { updateSession } = useContext(SessionContext);
+  const router = useRouter()
 
   async function onSubmit(formValues: AccountFormValues) {
     try {
       setIsLoading(true)
-      console.log('formValues:: ', formValues)
-      const response = await api<{
-        accessToken: string,
-        establishment: Establishment,
-      }>('/auth/sign-in', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...formValues,
-        })
-      })
-      console.log('response:: ', response)
-      if(!response.data?.accessToken) {
-        throw new Error('Erro na autenticação')
+      const response = await signIn("credentials", {
+        email: formValues.email.toLocaleLowerCase(),
+        password: formValues.password,
+        redirect: false
+      });
+
+      if(!response?.ok) {
+        throw new Error(response?.error || "Erro na autenticação")
       }
-      updateSession({
-        isAuthenticated: true,
-        establishment: response.data.establishment,
-      })
-      if(typeof window !== 'undefined') {
-        localStorage.setItem('accessToken', response.data.accessToken)
-      }
-      toast({
-        title: "Login realizado com sucesso!",
-      })
+      toast("Login realizado com sucesso!")
+      router.push('/')
     } catch(error) {
-      toast({
-        title: "Erro na autenticação",
-      })
+      console.log('error:: ', error);
+      toast("Erro na autenticação")
     } finally {
       setIsLoading(false)
     }
@@ -86,32 +71,32 @@ export function SignInForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-2">
           <div className="grid gap-1">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Senha</FormLabel>
-                <FormControl>
-                  <Input {...field} type="password"/>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />          
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
           </div>
           <Button disabled={isLoading} type="submit">
             {isLoading && (

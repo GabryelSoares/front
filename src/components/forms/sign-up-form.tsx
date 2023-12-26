@@ -1,19 +1,15 @@
 "use client"
-import { useContext, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { Button } from "../ui/button"
 import { Input } from "../ui/input"
-import { Icons } from "../atoms/icons/icons"
 
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
-import { toast } from "@/components/ui/use-toast"
-import { SessionContext } from "@/context/session-context"
-import { api } from "@/lib/api"
+import { signUp } from "@/_core/infra/actions/auth/signUp"
+import { SubmitButton } from "../atoms/submit-button/submit-button"
 
 const formSchema = z.object({
   name: z.string().min(8, {
@@ -56,48 +52,10 @@ export function SignUpForm() {
     resolver: zodResolver(formSchema),
     defaultValues,
   })
-  const [isLoading, setIsLoading] = useState(false)
-  const { updateSession } = useContext(SessionContext);
-
-  async function onSubmit(formValues: z.infer<typeof formSchema>) {
-    console.log('onSubmit!');
-    try {
-      setIsLoading(true)
-      console.log('formValues:: ', formValues)
-      const response = await api<any>('/auth/sign-up', {
-        method: 'POST', // Adicione esta linha para indicar que é uma solicitação POST
-        body: JSON.stringify({
-          ...formValues,
-          carSlots: parseInt(formValues.carSlots || '10'),
-          motorcycleSlots: parseInt(formValues.motorcycleSlots || '10')
-        })
-      })
-      console.log('response:: ', response)
-      if(response.data?.accessToken) {
-        updateSession({
-          isAuthenticated: true,
-          establishment: response.data.establishment,
-        })
-        if(typeof window !== 'undefined') {
-          localStorage.setItem('accessToken', response.data.accessToken)
-        }
-        toast({
-          title: "Usuário cadastrado com sucesso",
-        })
-      }
-      throw new Error('Erro ao cadastrar usuário')
-    } catch(error) {
-      toast({
-        title: "Erro ao cadastrar usuário",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form action={signUp} className="space-y-8">
         <div className="grid gap-2">
           <FormField
             control={form.control}
@@ -108,7 +66,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -121,7 +79,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -134,7 +92,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -147,7 +105,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -160,7 +118,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -173,7 +131,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -186,7 +144,7 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} type="number" />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -199,16 +157,11 @@ export function SignUpForm() {
                 <FormControl>
                   <Input {...field} type="number" />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
-          <Button disabled={isLoading} type="submit">
-            {isLoading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin bg-red-500" />
-            )}
-            Continuar
-          </Button>
+          <SubmitButton />
         </div>
       </form>
     </Form>

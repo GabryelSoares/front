@@ -1,22 +1,23 @@
 "use client"
-import { useContext } from "react"
+import { useCallback, useContext } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/atoms/icons/icons"
 import { VehicleTypeEnum } from "@/enums/vehicle-type.enum"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { CreateVehicleFormValues, createVehicleSchema } from "@/_core/domain/schemas/vehicle/create-vehicle-schema"
+import { SubmitButton } from "@/components/atoms/submit-button/submit-button"
+import { createVehicle } from "@/_core/infra/actions/vehicles/createVehicle"
+import { toast } from "sonner"
 import { VehiclesContext } from "@/context/vehicles-context"
-import { CreateVehicleFormValues, createVehicleSchema } from "@/app/schemas/vehicle/create-vehicle-schema"
 
 
 const defaultValues: Partial<CreateVehicleFormValues> = {
-  // email: "gabryel@gmail.com",
+  type: String(VehicleTypeEnum.CAR),
 }
 
 export function CreateVehicleForm() {
@@ -24,12 +25,33 @@ export function CreateVehicleForm() {
     resolver: zodResolver(createVehicleSchema),
     defaultValues,
   })
-  const { createVehicle, isLoading } = useContext(VehiclesContext)
+
+  const { setShowCreateVehicleModal, setSubmitFetchVehicles } = useContext(VehiclesContext)
+
+  const handleSubmit = useCallback(() => {
+    const formValues = form.getValues()
+    console.log('formValues:: ', formValues)
+    createVehicle(formValues).then((value) => {
+      toast('Veículo criado com sucesso!')
+      setShowCreateVehicleModal(false);
+      setSubmitFetchVehicles(true)
+    }).catch((error) => {
+      console.log('error:: ', error)
+      toast("Erro ao cadastrar veículo", {
+        description: String(error),
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      })
+    })
+  }, []);
 
   return (
-    <div className="flex items-center space-x-2">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(createVehicle)} className="space-y-8">
+    <div className="flex items-center">
+      <Form {...form} >
+        <form
+          className="w-full">
           <div className="grid gap-2">
             <FormField
               control={form.control}
@@ -89,7 +111,7 @@ export function CreateVehicleForm() {
               render={({ field }) => (
                 <FormItem {...field}>
                   <FormLabel>Tipo</FormLabel>
-                  <RadioGroup defaultValue={String(VehicleTypeEnum.CAR)}>
+                  <RadioGroup className="flex" defaultValue={defaultValues.type}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value={String(VehicleTypeEnum.CAR)} id="r1" />
                       <Label htmlFor="r1">Carro</Label>
@@ -103,12 +125,7 @@ export function CreateVehicleForm() {
                 </FormItem>
               )}
             />
-            <Button disabled={isLoading} type="submit">
-              {isLoading && (
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin bg-red-500" />
-              )}
-              Continuar
-            </Button>
+            <SubmitButton onClick={handleSubmit} type="button" />
           </div>
         </form>
       </Form>

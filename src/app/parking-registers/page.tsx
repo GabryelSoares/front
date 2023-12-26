@@ -8,9 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useEffect, useState } from "react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { api } from "@/lib/api"
-import { ParkingRegister } from "@/models/parking-register"
+import { ParkingRegister } from "@/_core/domain/models/parking-register"
 import { formatDate } from "@/lib/utils"
 
 export default function ParkingRegisters() {
@@ -25,8 +25,12 @@ export default function ParkingRegisters() {
         setParkingRegisters(response.data)
       })
     } catch(error) {
-      toast({
-        title: "Erro ao buscar registros de estacionamento",
+      toast("Erro ao buscar registros de estacionamento", {
+        description: String(error),
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
       })
     } finally {
       setIsLoading(false)

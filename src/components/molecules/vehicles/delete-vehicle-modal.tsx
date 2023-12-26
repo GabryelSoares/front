@@ -1,7 +1,7 @@
 "use client"
 import { VehiclesContext } from '@/context/vehicles-context'
 import { BookPlusIcon } from 'lucide-react'
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
 import {
   Dialog,
   DialogClose,
@@ -12,9 +12,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
+import { deleteVehicle } from '@/_core/infra/actions/vehicles/delete-vehicle'
+import { toast } from 'sonner'
 
 export default function DeleteVehicleModal() {
-  const { showDeleteVehicleModal, setShowDeleteVehicleModal, deleteVehicle, selectedVehicles } = useContext(VehiclesContext)
+  const { showDeleteVehicleModal, selectedVehicles, setShowDeleteVehicleModal, setSubmitFetchVehicles } = useContext(VehiclesContext)
+  
+  const handleSubmit = useCallback(() => {
+    deleteVehicle(selectedVehicles[0].id).then(() => {
+      toast("Veículo apagado com sucesso!")
+      setSubmitFetchVehicles(true)
+      setShowDeleteVehicleModal(false)
+    }).catch((error) => {
+      toast(error.message || "Erro ao apagar veículo")
+    })
+  }, [selectedVehicles]);
+  
   return (
     <Dialog open={showDeleteVehicleModal} onOpenChange={setShowDeleteVehicleModal}>
       <DialogTrigger asChild>
@@ -28,15 +41,8 @@ export default function DeleteVehicleModal() {
           <p>Tem certeza que deseja apagar o veículo?</p>
           <p>Esta ação não pode ser desfeita.</p>
         </div>
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Cancelar
-            </Button>
-          </DialogClose>
-          <Button type="submit" variant="default" onClick={() => {
-            deleteVehicle(selectedVehicles[0]?.id)
-          }}>
+        <DialogFooter className="sm:justify-end">
+          <Button type="submit" variant="default" onClick={handleSubmit}>
             Apagar
           </Button>
         </DialogFooter>

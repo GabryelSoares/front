@@ -26,13 +26,6 @@ export default function ViewVehicleModal() {
           <DialogTitle>Detalhes do veículo</DialogTitle>
         </DialogHeader>
         <ViewVehicleForm />
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Fechar
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

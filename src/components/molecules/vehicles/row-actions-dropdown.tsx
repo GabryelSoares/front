@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Vehicle } from "@/models/vehicle"
+import { Vehicle } from "@/_core/domain/models/vehicle"
 import { DotsVerticalIcon } from "@radix-ui/react-icons"
 import { VehiclesContext } from "@/context/vehicles-context"
 import { useContext } from "react"

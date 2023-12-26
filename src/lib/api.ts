@@ -1,5 +1,5 @@
 'use client'
-import { ApiResponse } from "@/models/api-response";
+import { ApiResponse } from "@/_core/domain/models/api-response";
 
 export const api = async <T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
   // console.log('api:: ', url, options)
