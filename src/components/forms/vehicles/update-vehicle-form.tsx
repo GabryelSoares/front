@@ -55,7 +55,7 @@ export function UpdateVehicleForm() {
   return (
     <div className="flex items-center space-x-2">
       <Form {...form}>
-        <form className="space-y-8">
+        <form className="w-full">
           <div className="grid gap-2">
             <FormField
               control={form.control}
@@ -66,7 +66,7 @@ export function UpdateVehicleForm() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -79,7 +79,7 @@ export function UpdateVehicleForm() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -92,7 +92,7 @@ export function UpdateVehicleForm() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -105,7 +105,7 @@ export function UpdateVehicleForm() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -125,7 +125,7 @@ export function UpdateVehicleForm() {
                       <Label htmlFor="r2">Moto</Label>
                     </div>
                   </RadioGroup>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />

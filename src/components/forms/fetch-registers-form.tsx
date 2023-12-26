@@ -91,7 +91,7 @@ export function AccountForm() {
                 This is the name that will be displayed on your profile and in
                 emails.
               </FormDescription>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -135,7 +135,7 @@ export function AccountForm() {
               <FormDescription>
                 Your date of birth is used to calculate your age.
               </FormDescription>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />

@@ -8,86 +8,98 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useEffect, useState } from "react"
+import { useCallback, useContext, useEffect } from "react"
+import { Search } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { EstablishmentsContext } from "@/context/establishments-context"
+import { RowActionsDropdown } from "@/components/molecules/establishments/row-actions-dropdown"
+import ViewEstablishmentModal from "@/components/molecules/establishments/view-establishment-modal"
+import UpdateEstablishmentModal from "@/components/molecules/establishments/update-establishment-modal"
+import DeleteEstablishmentModal from "@/components/molecules/establishments/delete-establishment-modal"
+import { getEstablishments } from "@/_core/infra/actions/establishments/get-establishments"
 import { toast } from "sonner"
-import { Establishment } from "@/_core/domain/models/establishment"
-import { api } from "@/lib/api"
 
 export default function EstablishmentsPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [establishments, setEstablishments] = useState<Establishment[]>([])
+  const {
+    isLoading,
+    establishments,
+    setEstablishments,
+    showCreateEstablishmentModal,
+    setShowCreateEstablishmentModal,
+    showUpdateEstablishmentModal,
+    showDeleteEstablishmentModal,
+    showViewEstablishmentModal,
+    setSubmitFetchEstablishments,
+    submitFetchEstablishments
+  } = useContext(EstablishmentsContext)
 
-  async function getEstablishments() {
-    try {
-      setIsLoading(true)
-      const response = await api<Establishment[]>('/establishments', {
-        method: 'GET',
-      })
-      console.log('response:: ', response)
-      if(response.data) {
-        setEstablishments(response.data)
-      }
-      throw new Error('Erro na autenticação')
-    } catch(error) {
-      toast("Erro ao buscar estabelecimentos", {
-        description: String(error),
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const handleSubmit = useCallback(() => {
+    // const formValues = form.getValues()
+    // console.log('formValues:: ', formValues)
+    getEstablishments().then((establishments) => {
+      toast('Lista de estabelecimentos atualizada com sucesso!')
+      setEstablishments(establishments)
+      setSubmitFetchEstablishments(false)
+    }).catch((error) => {
+      console.log('error:: ', error)
+      toast(error.message || "Erro ao buscar estabelecimentos")
+    })
+  }, []);
 
   useEffect(() => {
-    if(establishments) {
-      console.log('establishments:: ', establishments)
+    if(submitFetchEstablishments) {
+      console.log('submitFetchEstablishments:: ', submitFetchEstablishments)
+      handleSubmit()
     }
-  }, [establishments])
+  }, [submitFetchEstablishments])
 
   return (
     <div className="p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Establishments</h1>
+        <div />
+        {/* <ListEstablishmentsForm onSubmit={handleSubmit} /> */}
         <button
-          className="rounded-md p-2 text-gray-700 outline-none focus:border focus:border-gray-400"
+          
           disabled={isLoading}
-          onClick={() => getEstablishments()}
+          onClick={handleSubmit}
         >
-          Search
+          <Search />
         </button>
       </div>
-      <>
+      <Card>
         <Table>
-          <TableCaption>A list of establishments.</TableCaption>
+          <TableCaption>Lista de estabelecimentos</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Name</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead className="w-[100px]">Car Slots</TableHead>
-              <TableHead>Motorcycle Slots</TableHead>
-              <TableHead>Cnpj</TableHead>
+              <TableHead className="" />
+              <TableHead>Nome</TableHead>
+              <TableHead>CNPJ</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead className="text-right">Phone</TableHead>
+              <TableHead>Endereço</TableHead>
+              <TableHead>Telefone</TableHead>
+              <TableHead>Vagas para motos</TableHead>
+              <TableHead>Vagas para carros</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {establishments && establishments?.map((item, idx) => (
-              <TableRow key={item?.id || idx}>
-                <TableHead className="w-[100px]">{item?.name || '-'}</TableHead>
-                <TableHead className="font-medium">{item?.address || '-'}</TableHead>
-                <TableHead>{item?.availableCarSlots || '-'}/{item?.carSlots || '-'}</TableHead>
-                <TableHead>{item?.availableMotorcycleSlots || '-'}/{item?.motorcycleSlots || '-'}</TableHead>
+            {establishments && Array.isArray(establishments) && establishments?.map((item, i) => (
+              <TableRow key={item.id || i}>
+                <TableHead><RowActionsDropdown establishment={item} /></TableHead>
+                <TableHead className="font-medium">{item?.name || '-'}</TableHead>
                 <TableHead>{item?.cnpj || '-'}</TableHead>
                 <TableHead>{item?.email || '-'}</TableHead>
+                <TableHead>{item?.address || '-'}</TableHead>
                 <TableHead>{item?.phone || '-'}</TableHead>
+                <TableHead>{item?.motorcycleSlots || '-'}</TableHead>
+                <TableHead>{item?.carSlots || '-'}</TableHead>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </>
+      </Card>
+      {showViewEstablishmentModal && <ViewEstablishmentModal />}
+      {showUpdateEstablishmentModal && <UpdateEstablishmentModal />}
+      {showDeleteEstablishmentModal && <DeleteEstablishmentModal />}
     </div>
   )
 }

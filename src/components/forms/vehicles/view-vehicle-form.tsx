@@ -29,7 +29,7 @@ export function ViewVehicleForm() {
   return (
     <div className="flex items-center space-x-2">
       <Form {...form}>
-        <form onSubmit={() => {}} className="space-y-8">
+        <form className="w-full">
           <div className="grid gap-2">
             <FormField
               control={form.control}
@@ -40,7 +40,7 @@ export function ViewVehicleForm() {
                   <FormControl>
                     <Input {...field} value={selectedVehicles[0]?.brand} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -53,7 +53,7 @@ export function ViewVehicleForm() {
                   <FormControl>
                     <Input {...field} value={selectedVehicles[0]?.model} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -66,7 +66,7 @@ export function ViewVehicleForm() {
                   <FormControl>
                     <Input {...field} value={selectedVehicles[0]?.color} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -79,7 +79,7 @@ export function ViewVehicleForm() {
                   <FormControl>
                     <Input {...field} value={selectedVehicles[0]?.plate} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -99,7 +99,7 @@ export function ViewVehicleForm() {
                       <Label htmlFor="r2">Moto</Label>
                     </div>
                   </RadioGroup>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />

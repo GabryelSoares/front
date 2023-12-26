@@ -64,7 +64,7 @@ export function ListVehiclesForm({ onSubmit }: Props) {
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
@@ -84,7 +84,7 @@ export function ListVehiclesForm({ onSubmit }: Props) {
                           <Label htmlFor="r2">Moto</Label>
                         </div>
                       </RadioGroup>
-                      <FormMessage />
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
@@ -128,7 +128,7 @@ export function ListVehiclesForm({ onSubmit }: Props) {
                       <FormDescription>
                         Entrada do veículo no estacionamento
                       </FormDescription>
-                      <FormMessage />
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
