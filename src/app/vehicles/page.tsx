@@ -30,6 +30,9 @@ import DeleteVehicleModal from "@/components/molecules/vehicles/delete-vehicle-m
 import { getVehicles } from "@/_core/infra/actions/vehicles/getVehicles"
 import { toast } from "sonner"
 import { ListVehiclesForm } from "@/components/forms/vehicles/list-vehicles-form"
+import { CreateParkingRegisterModal } from "@/components/modals/create-parking-register-modal"
+import { CreateVehicleModal } from "@/components/modals/create-vehicle-modal"
+import { VehicleTypeEnum } from "@/enums/vehicle-type.enum"
 
 export default function VehiclesPage() {
   const {
@@ -67,18 +70,11 @@ export default function VehiclesPage() {
 
   return (
     <div className="p-4">
+      <CreateParkingRegisterModal />
       <div className="flex items-center justify-between">
-        <Dialog open={showCreateVehicleModal} onOpenChange={setShowCreateVehicleModal}>
-          <DialogTrigger asChild>
-            <h1 className="text-2xl font-semibold tracking-tight flex flex-row hover:text-blue-500 text-blue-700 hover:cursor-pointer"><span className="pt-1 pr-1"><BookPlusIcon /></span> Vehicles</h1>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Cadastrar veículo</DialogTitle>
-            </DialogHeader>
-            <CreateVehicleForm />
-          </DialogContent>
-        </Dialog>
+        <CreateVehicleModal>
+          <h1 className="text-2xl font-semibold tracking-tight flex flex-row hover:text-blue-500 text-blue-700 hover:cursor-pointer"><span className="pt-1 pr-1"><BookPlusIcon /></span> Vehicles</h1>
+        </CreateVehicleModal>
         {/* <ListVehiclesForm onSubmit={handleSubmit} /> */}
         <button
           
@@ -106,7 +102,7 @@ export default function VehiclesPage() {
               <TableRow key={item.id || i}>
                 <TableHead><RowActionsDropdown vehicle={item} /></TableHead>
                 <TableHead className="font-medium">{item?.plate || '-'}</TableHead>
-                <TableHead>{item?.type || '-'}</TableHead>
+                <TableHead>{item?.type === VehicleTypeEnum.CAR ? 'Carro' : 'Moto'}</TableHead>
                 <TableHead>{item?.brand || '-'}</TableHead>
                 <TableHead>{item?.model || '-'}</TableHead>
                 <TableHead>{item?.color || '-'}</TableHead>

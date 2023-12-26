@@ -10,24 +10,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Vehicle } from "@/_core/domain/models/vehicle"
+import { ParkingRegister } from "@/_core/domain/models/parking-register"
 import { DotsVerticalIcon } from "@radix-ui/react-icons"
 import { ParkingRegistersContext } from "@/context/parking-registers-context"
-import { VehiclesContext } from "@/context/vehicles-context"
 import { useContext } from "react"
 
 interface Props {
-  vehicle: Vehicle
+  parkingRegister: ParkingRegister
 }
-export function RowActionsDropdown({ vehicle }: Props) {
+export function RowActionsDropdown({ parkingRegister }: Props) {
+
   const {
-    setShowViewVehicleModal,
-    setShowUpdateVehicleModal,
-    setShowDeleteVehicleModal,
-    setSelectedVehicles,
-  } = useContext(VehiclesContext)
-  const {
-    setShowCreateParkingRegisterModal
+    setShowViewParkingRegisterModal,
+    setShowUpdateParkingRegisterModal,
+    setShowDeleteParkingRegisterModal,
+    setSelectedParkingRegisters,
   } = useContext(ParkingRegistersContext)
 
   return (
@@ -41,31 +38,23 @@ export function RowActionsDropdown({ vehicle }: Props) {
         <DropdownMenuLabel>Ações</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="p-0" onClick={() => {
-          setShowViewVehicleModal(true)
-          setSelectedVehicles([vehicle])
+          setShowViewParkingRegisterModal(true)
+          setSelectedParkingRegisters([parkingRegister])
         }}>
           <span className="hover:bg-gray-100 p-2 w-full h-full transition-transform duration-200 hover:cursor-pointer">Visualizar</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="p-0" onClick={() => {
-          setShowUpdateVehicleModal(true)
-          setSelectedVehicles([vehicle])
+          setShowUpdateParkingRegisterModal(true)
+          setSelectedParkingRegisters([parkingRegister])
         }}>
           <span className="hover:bg-gray-100 p-2 w-full h-full transition-transform duration-200 hover:cursor-pointer">Alterar</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="p-0" onClick={() => {
-          setShowDeleteVehicleModal(true)
-          setSelectedVehicles([vehicle])
+          setShowDeleteParkingRegisterModal(true)
+          setSelectedParkingRegisters([parkingRegister])
         }}>
           <span className="hover:bg-gray-100 p-2 w-full h-full transition-transform duration-200 hover:cursor-pointer">Apagar</span>
         </DropdownMenuItem>
-        {/* {!vehicle.updatedAt && (
-          <DropdownMenuItem className="p-0" onClick={() => {
-            setShowCreateParkingRegisterModal(true)
-            setSelectedVehicles([vehicle])
-          }}>
-            <span className="hover:bg-gray-100 p-2 w-full h-full transition-transform duration-200 hover:cursor-pointer">Registrar entrada</span>
-          </DropdownMenuItem>
-        )} */}
       </DropdownMenuContent>
     </DropdownMenu>
   )

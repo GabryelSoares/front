@@ -58,9 +58,9 @@ export function SignInForm() {
       }
       toast("Login realizado com sucesso!")
       router.push('/')
-    } catch(error) {
+    } catch(error: any) {
       console.log('error:: ', error);
-      toast("Erro na autenticação")
+      toast(error?.message || "Erro na autenticação")
     } finally {
       setIsLoading(false)
     }

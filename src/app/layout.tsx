@@ -7,6 +7,7 @@ import { VehiclesProvider } from '@/context/vehicles-context'
 import LayoutGrid from './layout-grid'
 import { Toaster } from "@/components/ui/sonner"
 import { EstablishmentsProvider } from '@/context/establishments-context'
+import { ParkingRegistersProvider } from '@/context/parking-registers-context'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <SessionProvider>
       <VehiclesProvider>
         <EstablishmentsProvider>
+          <ParkingRegistersProvider>
           <html lang="en">
             <head>
               {/* <script src="https://js.hcaptcha.com/1/api.js" async defer></script> */}
@@ -26,6 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Toaster />
             </body>
           </html>
+          </ParkingRegistersProvider>
         </EstablishmentsProvider>
       </VehiclesProvider>
     </SessionProvider>

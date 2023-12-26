@@ -1,4 +1,5 @@
 "use client"
+
 import {
   Table,
   TableBody,
@@ -7,79 +8,103 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useEffect, useState } from "react"
+import { useCallback, useContext, useEffect } from "react"
+import { BookPlusIcon, Search } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { ParkingRegistersContext } from "@/context/parking-registers-context"
+import { RowActionsDropdown } from "@/components/molecules/parking-registers/row-actions-dropdown"
+import ViewParkingRegisterModal from "@/components/molecules/parking-registers/view-parking-register-modal"
+import UpdateParkingRegisterModal from "@/components/molecules/parking-registers/update-parking-register-modal"
+import DeleteParkingRegisterModal from "@/components/molecules/parking-registers/delete-parking-register-modal"
+import { getParkingRegisters } from "@/_core/infra/actions/parking-registers/get-parking-registers"
 import { toast } from "sonner"
-import { api } from "@/lib/api"
-import { ParkingRegister } from "@/_core/domain/models/parking-register"
 import { formatDate } from "@/lib/utils"
+import { CreateParkingRegisterModal } from "@/components/modals/create-parking-register-modal"
 
-export default function ParkingRegisters() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [parkingRegisters, setParkingRegisters] = useState<ParkingRegister[]>([])
+export default function ParkingRegistersPage() {
+  const {
+    isLoading,
+    parkingRegisters,
+    setParkingRegisters,
+    showUpdateParkingRegisterModal,
+    showDeleteParkingRegisterModal,
+    showViewParkingRegisterModal,
+    setSubmitFetchParkingRegisters,
+    submitFetchParkingRegisters
+  } = useContext(ParkingRegistersContext)
 
-  async function getParkingRegisters() {
-    setIsLoading(true)
-    try {
-      api<ParkingRegister[]>('/parking-registers').then((response) => {
-        console.log('response:: ', response)
-        setParkingRegisters(response.data)
-      })
-    } catch(error) {
-      toast("Erro ao buscar registros de estacionamento", {
-        description: String(error),
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const handleSubmit = useCallback(() => {
+    // const formValues = form.getValues()
+    // console.log('formValues:: ', formValues)
+    getParkingRegisters().then((parkingRegisters) => {
+      toast('Lista de veículos atualizada com sucesso!')
+      setParkingRegisters(parkingRegisters)
+      setSubmitFetchParkingRegisters(false)
+    }).catch((error) => {
+      console.log('error:: ', error)
+      toast(error.message || "Erro ao buscar veículos")
+    })
+  }, []);
 
   useEffect(() => {
-    if(parkingRegisters) {
-      console.log('parkingRegisters:: ', parkingRegisters)
+    if(submitFetchParkingRegisters) {
+      console.log('submitFetchParkingRegisters:: ', submitFetchParkingRegisters)
+      handleSubmit()
     }
+  }, [submitFetchParkingRegisters])
+
+  useEffect(() => {
+    console.log('parkingRegisters:: ', parkingRegisters)
   }, [parkingRegisters])
 
   return (
     <div className="p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Registros de entrada e saída</h1>
-        <div>
-            
-        </div>
+        <CreateParkingRegisterModal>
+          <h1 className="text-2xl font-semibold tracking-tight flex flex-row hover:text-blue-500 text-blue-700 hover:cursor-pointer">
+            <span className="pt-1 pr-1">
+              <BookPlusIcon />
+            </span>
+            Registros de estacionamento
+          </h1>
+        </CreateParkingRegisterModal>
+        {/* <ListParkingRegistersForm onSubmit={handleSubmit} /> */}
         <button
-          className="rounded-md p-2 text-gray-700 outline-none focus:border focus:border-gray-400"
+
           disabled={isLoading}
-          onClick={() => getParkingRegisters()}
+          onClick={handleSubmit}
         >
-          Pesquisar
+          <Search />
         </button>
       </div>
-      <>
+      <Card>
         <Table>
-          <TableCaption>A list of parking registers.</TableCaption>
+          <TableCaption>Lista de entrada/saída</TableCaption>
           <TableHeader>
             <TableRow>
+              <TableHead className="" />
+              <TableHead>Placa</TableHead>
+              <TableHead>Modelo</TableHead>
               <TableHead>Entrada</TableHead>
               <TableHead>Saída</TableHead>
-              <TableHead>Veículo</TableHead>
-              <TableHead>Cor</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {parkingRegisters && parkingRegisters?.map((item, i) => (
-              <TableRow key={item?.id || i}>
+            {parkingRegisters && Array.isArray(parkingRegisters) && parkingRegisters?.map((item, i) => (
+              <TableRow key={item.id || i}>
+                <TableHead><RowActionsDropdown parkingRegister={item} /></TableHead>
                 <TableHead className="font-medium">{item?.vehicle?.plate || '-'}</TableHead>
+                <TableHead>{String(item?.vehicle?.model)}</TableHead>
                 <TableHead>{item?.entry ? formatDate(new Date(item.entry)) : '-'}</TableHead>
                 <TableHead>{item?.exit ? formatDate(new Date(item.exit)) : '-'}</TableHead>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </>
+      </Card>
+      {showViewParkingRegisterModal && <ViewParkingRegisterModal />}
+      {showUpdateParkingRegisterModal && <UpdateParkingRegisterModal />}
+      {showDeleteParkingRegisterModal && <DeleteParkingRegisterModal />}
     </div>
   )
 }

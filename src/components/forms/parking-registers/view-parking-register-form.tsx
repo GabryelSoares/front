@@ -1,51 +1,35 @@
 "use client"
-import { useCallback, useContext } from "react"
+import { useContext } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Icons } from "@/components/atoms/icons/icons"
 import { VehicleTypeEnum } from "@/enums/vehicle-type.enum"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { CreateVehicleFormValues, createVehicleSchema } from "@/_core/domain/schemas/vehicle/create-vehicle-schema"
-import { SubmitButton } from "@/components/atoms/submit-button/submit-button"
-import { createVehicle } from "@/_core/infra/actions/vehicles/createVehicle"
-import { toast } from "sonner"
 import { VehiclesContext } from "@/context/vehicles-context"
+import { CreateVehicleFormValues, createVehicleSchema } from "@/_core/domain/schemas/vehicle/create-vehicle-schema"
 
 
 const defaultValues: Partial<CreateVehicleFormValues> = {
-  type: String(VehicleTypeEnum.CAR),
+  // email: "gabryel@gmail.com",
 }
 
-export function CreateVehicleForm() {
+export function ViewVehicleForm() {
   const form = useForm<CreateVehicleFormValues>({
     resolver: zodResolver(createVehicleSchema),
     defaultValues,
   })
-
-  const { setShowCreateVehicleModal, setSubmitFetchVehicles } = useContext(VehiclesContext)
-
-  const handleSubmit = useCallback(() => {
-    const formValues = form.getValues()
-    console.log('formValues:: ', formValues)
-    createVehicle(formValues).then((value) => {
-      toast('Veículo criado com sucesso!')
-      setShowCreateVehicleModal(false);
-      setSubmitFetchVehicles(true)
-    }).catch((error) => {
-      console.log('error:: ', error)
-      toast(error.message || "Erro ao cadastrar veículo")
-    })
-  }, []);
+  const { selectedVehicles } = useContext(VehiclesContext)
 
   return (
-    <div className="flex items-center">
-      <Form {...form} >
-        <form
-          className="w-full">
+    <div className="flex items-center space-x-2">
+      <Form {...form}>
+        <form className="w-full">
           <div className="grid gap-2">
             <FormField
               control={form.control}
@@ -54,7 +38,7 @@ export function CreateVehicleForm() {
                 <FormItem>
                   <FormLabel>Marca</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={selectedVehicles[0]?.brand} />
                   </FormControl>
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -67,7 +51,7 @@ export function CreateVehicleForm() {
                 <FormItem>
                   <FormLabel>Modelo</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={selectedVehicles[0]?.model} />
                   </FormControl>
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -80,7 +64,7 @@ export function CreateVehicleForm() {
                 <FormItem>
                   <FormLabel>Cor</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={selectedVehicles[0]?.color} />
                   </FormControl>
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -93,7 +77,7 @@ export function CreateVehicleForm() {
                 <FormItem>
                   <FormLabel>Placa</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={selectedVehicles[0]?.plate} />
                   </FormControl>
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -105,7 +89,7 @@ export function CreateVehicleForm() {
               render={({ field }) => (
                 <FormItem {...field}>
                   <FormLabel>Tipo</FormLabel>
-                  <RadioGroup className="flex" defaultValue={defaultValues.type}>
+                  <RadioGroup className="flex" value={String(selectedVehicles[0]?.type || '')}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value={String(VehicleTypeEnum.CAR)} id="r1" />
                       <Label htmlFor="r1">Carro</Label>
@@ -119,7 +103,6 @@ export function CreateVehicleForm() {
                 </FormItem>
               )}
             />
-            <SubmitButton onClick={handleSubmit} type="button" />
           </div>
         </form>
       </Form>
