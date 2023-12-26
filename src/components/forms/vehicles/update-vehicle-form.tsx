@@ -115,7 +115,7 @@ export function UpdateVehicleForm() {
               render={({ field }) => (
                 <FormItem {...field}>
                   <FormLabel>Tipo</FormLabel>
-                  <RadioGroup defaultValue={String(selectedVehicles[0].type)}>
+                  <RadioGroup className="flex" defaultValue={String(selectedVehicles[0].type)}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value={String(VehicleTypeEnum.CAR)} id="r1" />
                       <Label htmlFor="r1">Carro</Label>

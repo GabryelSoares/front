@@ -89,7 +89,7 @@ export function ViewVehicleForm() {
               render={({ field }) => (
                 <FormItem {...field}>
                   <FormLabel>Tipo</FormLabel>
-                  <RadioGroup value={String(selectedVehicles[0]?.type || '')}>
+                  <RadioGroup className="flex" value={String(selectedVehicles[0]?.type || '')}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value={String(VehicleTypeEnum.CAR)} id="r1" />
                       <Label htmlFor="r1">Carro</Label>
